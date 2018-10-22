@@ -5,32 +5,29 @@ import "fmt"
 import "os"
 import "github.com/cavaliercoder/grab"
 
-func Download(dest string, url string) string{
+func Download(dest string, url string) string {
 
-if stat, e := os.Stat(dest); os.IsNotExist(e){
-	fmt.Printf("File/directory %s does not exist. Creating.", dest)
-	fmt.Println()
+	if stat, e := os.Stat(dest); os.IsNotExist(e) {
+		fmt.Printf("File/directory %s does not exist. Creating.", dest)
+		fmt.Println()
 
-	os.Mkdir(wd + "/" + dest, 0777)
+		os.Mkdir(dest, 0777)
 
-	stat2, _ := os.Stat(dest)
-	fmt.Printf("Created %s. Is directory - %s", dest, stat2.IsDir())
-	fmt.Println()
+		stat2, _ := os.Stat(dest)
+		fmt.Printf("Created %s. Is directory - %s", dest, stat2.IsDir())
 
-} else {
-	fmt.Printf("File/directory %s already exists. Is directory - %s", dest, stat.IsDir())
-	fmt.Println()
-}
+	} else {
+		fmt.Printf("File/directory %s already exists. Is directory - %s", dest, stat.IsDir()) // TODO remove is dir
+	}
 
+	resp, _ := grab.Get(dest, url)
+	defer resp.HTTPResponse.Body.Close()
 
-resp, _ := grab.Get(dest, url)
-defer resp.HTTPResponse.Body.Close()
-
-/*
-	Waiting for file to be downloaded:
-*/
-t := time.NewTicker(time.Second)
-defer t.Stop()
+	/*
+		Waiting for file to be downloaded:
+	*/
+	t := time.NewTicker(time.Second)
+	defer t.Stop()
 	for {
 		select {
 		case <-t.C:
